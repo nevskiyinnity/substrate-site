@@ -16,11 +16,12 @@ interface Particle {
 
 export function IntroLoader({ onComplete }: { onComplete: () => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [phase, setPhase] = useState<"particles" | "hold" | "fade">("particles");
   const [visible, setVisible] = useState(true);
   const { reduceMotion } = useMotion();
   const animFrameRef = useRef<number>(0);
   const startTimeRef = useRef(0);
+  const phaseRef = useRef<"drift" | "spring" | "hold" | "fade">("drift");
+  const holdStartRef = useRef(0);
 
   const skip = useCallback(() => {
     cancelAnimationFrame(animFrameRef.current);
@@ -28,7 +29,6 @@ export function IntroLoader({ onComplete }: { onComplete: () => void }) {
     setTimeout(onComplete, 300);
   }, [onComplete]);
 
-  // Skip immediately if reduced motion
   useEffect(() => {
     if (reduceMotion) {
       setVisible(false);
@@ -36,7 +36,6 @@ export function IntroLoader({ onComplete }: { onComplete: () => void }) {
     }
   }, [reduceMotion, onComplete]);
 
-  // Skip on Escape
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") skip();
@@ -64,46 +63,56 @@ export function IntroLoader({ onComplete }: { onComplete: () => void }) {
 
     const centerX = w / 2;
     const centerY = h / 2 + 20;
-    const lineWidth = Math.min(200, w * 0.3);
+    const lineWidth = Math.min(220, w * 0.35);
     const particleCount = 30;
 
-    // Create particles scattered around center
     const particles: Particle[] = Array.from({ length: particleCount }, (_, i) => {
       const targetX = centerX - lineWidth / 2 + (lineWidth / (particleCount - 1)) * i;
       const targetY = centerY;
       return {
-        x: centerX + (Math.random() - 0.5) * w * 0.6,
-        y: centerY + (Math.random() - 0.5) * h * 0.4,
+        x: centerX + (Math.random() - 0.5) * w * 0.7,
+        y: centerY + (Math.random() - 0.5) * h * 0.5,
         targetX,
         targetY,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
         settled: false,
       };
     });
 
     startTimeRef.current = performance.now();
-    let holdStart = 0;
+
+    // Timing: drift 800ms → spring ~1200ms → hold 1000ms → fade 500ms = ~3.5s total
+    const DRIFT_DURATION = 800;
+    const HOLD_DURATION = 1000;
+    const FADE_DURATION = 500;
 
     const animate = (now: number) => {
       const elapsed = now - startTimeRef.current;
       ctx.clearRect(0, 0, w, h);
 
-      if (phase === "particles" || elapsed < 800) {
-        // Drift phase (first 300ms), then spring to targets
-        const springStart = 300;
-        const springStrength = elapsed > springStart ? 0.08 : 0;
-        const damping = 0.85;
+      const phase = phaseRef.current;
 
+      if (phase === "drift" || phase === "spring") {
+        const inSpring = elapsed > DRIFT_DURATION;
+        if (inSpring && phase === "drift") {
+          phaseRef.current = "spring";
+        }
+
+        // Slower spring for more organic convergence
+        const springStrength = inSpring ? 0.04 : 0;
+        const damping = 0.88;
         let allSettled = true;
 
         particles.forEach((p) => {
-          if (elapsed <= springStart) {
+          if (!inSpring) {
             // Gentle drift
             p.x += p.vx;
             p.y += p.vy;
+            // Slight random wobble
+            p.vx += (Math.random() - 0.5) * 0.02;
+            p.vy += (Math.random() - 0.5) * 0.02;
           } else {
-            // Spring toward target
             const dx = p.targetX - p.x;
             const dy = p.targetY - p.y;
             p.vx = (p.vx + dx * springStrength) * damping;
@@ -112,30 +121,34 @@ export function IntroLoader({ onComplete }: { onComplete: () => void }) {
             p.y += p.vy;
 
             const dist = Math.sqrt(dx * dx + dy * dy);
-            p.settled = dist < 0.5 && Math.abs(p.vx) < 0.1;
+            p.settled = dist < 0.5 && Math.abs(p.vx) < 0.05;
             if (!p.settled) allSettled = false;
           }
 
-          // Draw particle
-          const opacity = elapsed < 100 ? elapsed / 100 : 1;
+          // Fade in particles
+          const fadeIn = Math.min(1, elapsed / 200);
           ctx.beginPath();
           ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(120, 113, 108, ${opacity * 0.6})`;
+          ctx.fillStyle = `rgba(120, 113, 108, ${fadeIn * 0.6})`;
           ctx.fill();
         });
 
-        if (allSettled && elapsed > springStart + 200) {
-          setPhase("hold");
-          holdStart = now;
+        if (allSettled && inSpring) {
+          phaseRef.current = "hold";
+          holdStartRef.current = now;
         }
       }
 
       if (phase === "hold") {
-        if (!holdStart) holdStart = now;
-        const holdElapsed = now - holdStart;
+        if (!holdStartRef.current) holdStartRef.current = now;
+        const holdElapsed = now - holdStartRef.current;
 
-        // Draw settled line
-        const lineOpacity = holdElapsed > 400 ? Math.max(0, 1 - (holdElapsed - 400) / 300) : 1;
+        // Draw settled line, fade out at end of hold
+        const lineOpacity =
+          holdElapsed > HOLD_DURATION
+            ? Math.max(0, 1 - (holdElapsed - HOLD_DURATION) / FADE_DURATION)
+            : 1;
+
         particles.forEach((p) => {
           ctx.beginPath();
           ctx.arc(p.targetX, p.targetY, 2, 0, Math.PI * 2);
@@ -143,16 +156,16 @@ export function IntroLoader({ onComplete }: { onComplete: () => void }) {
           ctx.fill();
         });
 
-        if (holdElapsed > 700) {
-          setPhase("fade");
+        if (holdElapsed > HOLD_DURATION + FADE_DURATION) {
+          phaseRef.current = "fade";
           setVisible(false);
           setTimeout(onComplete, 400);
           return;
         }
       }
 
-      // Safety timeout at 2s
-      if (elapsed > 2000) {
+      // Safety timeout at 5s
+      if (elapsed > 5000) {
         skip();
         return;
       }
@@ -163,7 +176,7 @@ export function IntroLoader({ onComplete }: { onComplete: () => void }) {
     animFrameRef.current = requestAnimationFrame(animate);
 
     return () => cancelAnimationFrame(animFrameRef.current);
-  }, [reduceMotion, onComplete, phase, skip]);
+  }, [reduceMotion, onComplete, skip]);
 
   if (reduceMotion) return null;
 
@@ -174,25 +187,35 @@ export function IntroLoader({ onComplete }: { onComplete: () => void }) {
           className="fixed inset-0 z-50 flex cursor-pointer flex-col items-center justify-center bg-white"
           onClick={skip}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.4 }}
+          transition={{ duration: 0.5 }}
         >
           <div className="relative">
-            <h1 className="text-4xl font-semibold tracking-tight text-fg sm:text-5xl">
+            <motion.h1
+              className="text-4xl font-semibold tracking-tight text-fg sm:text-5xl"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
               Substrate
-            </h1>
-            <p className="mt-1 text-center text-sm italic text-fg-muted">
+            </motion.h1>
+            <motion.p
+              className="mt-1 text-center text-sm italic text-fg-muted"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
               noun
-            </p>
+            </motion.p>
           </div>
           <canvas
             ref={canvasRef}
             className="pointer-events-none absolute inset-0"
           />
           <motion.p
-            className="mt-6 max-w-md text-center text-sm text-fg-muted"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
+            className="mt-6 max-w-md text-center text-sm leading-relaxed text-fg-muted"
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.0, duration: 0.8 }}
           >
             An underlying layer that supports complex systems.
           </motion.p>
