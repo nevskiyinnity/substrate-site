@@ -8,22 +8,26 @@ const steps = [
   {
     number: "01",
     title: "Choose cores",
-    description: "Select the number of GPU cores for your workload.",
+    description:
+      "Select the number of GPU cores for your training or inference workload. Substrate allocates dedicated cores, never shared.",
   },
   {
     number: "02",
     title: "Add VRAM",
-    description: "Allocate video memory for model weights and tensors.",
+    description:
+      "Allocate video memory precisely for model weights, KV caches, and activation tensors. No memory tax from co-tenancy.",
   },
   {
     number: "03",
     title: "Add RAM",
-    description: "Set system memory for data loading and preprocessing.",
+    description:
+      "Set system memory for data loading, preprocessing, and host-side buffers. Scale independently from GPU resources.",
   },
   {
     number: "04",
     title: "Add storage",
-    description: "Attach fast SSD storage for datasets and checkpoints.",
+    description:
+      "Attach NVMe SSD storage for datasets, checkpoints, and artifacts. Provisioned in seconds, billed per GB used.",
   },
 ];
 
@@ -33,7 +37,7 @@ export function HowItWorks() {
   const { reduceMotion } = useMotion();
 
   return (
-    <section className="border-t border-border px-6 py-24 sm:py-32" ref={ref}>
+    <section className="px-6 py-24 sm:py-32" ref={ref}>
       <div className="mx-auto max-w-5xl">
         <motion.p
           className="text-xs font-medium uppercase tracking-widest text-fg-muted"
@@ -73,7 +77,6 @@ export function HowItWorks() {
                 delay: reduceMotion ? 0 : 0.2 + i * 0.1,
               }}
             >
-              {/* Connector line */}
               {i < steps.length - 1 && (
                 <div className="absolute top-5 left-10 hidden h-px w-full bg-border lg:block" />
               )}
@@ -88,7 +91,6 @@ export function HowItWorks() {
                 {step.description}
               </p>
 
-              {/* Substrate layer line */}
               <motion.div
                 className="mt-4 h-px bg-accent"
                 initial={reduceMotion ? { scaleX: 1 } : { scaleX: 0 }}
@@ -96,7 +98,7 @@ export function HowItWorks() {
                 transition={{
                   duration: 0.6,
                   delay: reduceMotion ? 0 : 0.4 + i * 0.15,
-                  ease: [0.25, 0.1, 0.25, 1],
+                  ease: [0.25, 0.1, 0.25, 1] as const,
                 }}
                 style={{ transformOrigin: "left" }}
               />

@@ -13,13 +13,22 @@ export function HeroDictionary() {
   const { reduceMotion } = useMotion();
 
   const anim = (delay: number) =>
-    reduceMotion
-      ? { initial: { opacity: 1, y: 0 } }
-      : fadeUp(delay);
+    reduceMotion ? { initial: { opacity: 1, y: 0 } } : fadeUp(delay);
 
   return (
-    <section className="px-6 pt-32 pb-16 sm:pt-40 sm:pb-24">
-      <div className="mx-auto max-w-3xl">
+    <section className="relative overflow-hidden px-6 pt-36 pb-16 sm:pt-44 sm:pb-24">
+      {/* Dot grid background */}
+      <div className="dot-grid pointer-events-none absolute inset-0 opacity-40" />
+      {/* Warm gradient pool */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 60% 40% at 30% 80%, rgba(120,113,108,0.06) 0%, transparent 70%)",
+        }}
+      />
+
+      <div className="relative mx-auto max-w-3xl">
         <motion.h1
           className="text-5xl font-semibold tracking-tight text-fg sm:text-7xl"
           {...anim(0)}
@@ -27,10 +36,7 @@ export function HeroDictionary() {
           Substrate
         </motion.h1>
 
-        <motion.p
-          className="mt-2 text-lg italic text-fg-muted"
-          {...anim(0.1)}
-        >
+        <motion.p className="mt-2 text-lg italic text-fg-muted" {...anim(0.1)}>
           noun
         </motion.p>
 
@@ -41,10 +47,7 @@ export function HeroDictionary() {
           An underlying layer that supports complex systems.
         </motion.p>
 
-        <motion.div
-          className="mt-1 h-px w-16 bg-border"
-          {...anim(0.25)}
-        />
+        <motion.div className="mt-1 h-px w-16 bg-border" {...anim(0.25)} />
 
         <motion.p
           className="mt-8 max-w-xl text-xl leading-relaxed text-fg sm:text-2xl"
@@ -60,7 +63,7 @@ export function HeroDictionary() {
         >
           <a
             href="#"
-            className="inline-flex h-12 items-center justify-center rounded-lg bg-accent px-6 text-sm font-medium text-white transition-all hover:bg-accent-hover hover:shadow-md"
+            className="inline-flex h-12 items-center justify-center rounded-lg bg-accent px-6 text-sm font-medium text-white transition-all hover:bg-accent-hover hover:shadow-[0_4px_16px_rgba(120,113,108,0.35)]"
           >
             Get access
           </a>

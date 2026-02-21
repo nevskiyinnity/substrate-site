@@ -7,7 +7,8 @@ import { useMotion } from "./motion-provider";
 const audiences = [
   {
     title: "ML engineers",
-    description: "Fine-tune models with precisely allocated GPU memory and compute.",
+    description:
+      "Fine-tune models with precisely allocated GPU memory and compute.",
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z" />
@@ -17,7 +18,8 @@ const audiences = [
   },
   {
     title: "AI startups",
-    description: "Scale from prototype to production without re-architecting infrastructure.",
+    description:
+      "Scale from prototype to production without re-architecting infrastructure.",
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
@@ -26,7 +28,8 @@ const audiences = [
   },
   {
     title: "Research labs",
-    description: "Run experiments with reproducible, precisely configured compute environments.",
+    description:
+      "Run experiments with reproducible, precisely configured compute environments.",
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M9 3v7.2L5.7 17a2 2 0 0 0 1.7 3h9.2a2 2 0 0 0 1.7-3L15 10.2V3" />
@@ -36,7 +39,8 @@ const audiences = [
   },
   {
     title: "Rendering studios",
-    description: "Allocate GPU cores for parallel rendering without fixed machine limits.",
+    description:
+      "Allocate GPU cores for parallel rendering without fixed machine limits.",
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <rect x="2" y="3" width="20" height="14" rx="2" />
@@ -46,7 +50,8 @@ const audiences = [
   },
   {
     title: "Simulation teams",
-    description: "Configure memory-heavy instances for physics, climate, or financial models.",
+    description:
+      "Configure memory-heavy instances for physics, climate, or financial models.",
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="10" />
@@ -62,7 +67,7 @@ export function TargetUsers() {
   const { reduceMotion } = useMotion();
 
   return (
-    <section className="border-t border-border px-6 py-24 sm:py-32" ref={ref}>
+    <section className="bg-surface px-6 py-24 sm:py-32" ref={ref}>
       <div className="mx-auto max-w-5xl">
         <motion.p
           className="text-xs font-medium uppercase tracking-widest text-fg-muted"
@@ -85,7 +90,7 @@ export function TargetUsers() {
           {audiences.map((audience, i) => (
             <motion.div
               key={audience.title}
-              className="group flex items-start gap-4 rounded-xl border border-border p-5 transition-all duration-200 hover:border-accent/40 hover:shadow-sm"
+              className="group flex items-start gap-4 rounded-xl border border-border bg-white p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)]"
               initial={reduceMotion ? {} : { opacity: 0, y: 12 }}
               animate={isInView || reduceMotion ? { opacity: 1, y: 0 } : {}}
               transition={{
