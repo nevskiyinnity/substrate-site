@@ -3,13 +3,21 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useMotion } from "./motion-provider";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
-const links = ["Product", "Docs", "Pricing", "About"];
+const links = [
+  { label: "Product", href: "/" },
+  { label: "Docs", href: "/docs" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "About", href: "/about" },
+];
 
 export function NavHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { reduceMotion } = useMotion();
+  const pathname = usePathname();
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 24);
@@ -25,11 +33,15 @@ export function NavHeader() {
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
-  // Lock body scroll when mobile menu is open
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
 
   return (
     <>
@@ -41,20 +53,27 @@ export function NavHeader() {
         }`}
       >
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-          <a href="#" className="text-base font-semibold tracking-tight text-fg">
+          <Link href="/" className="text-base font-semibold tracking-tight text-fg">
             Substrate
-          </a>
+          </Link>
 
           <nav className="hidden items-center gap-7 md:flex">
-            {links.map((link) => (
-              <a
-                key={link}
-                href="#"
-                className="nav-link text-sm text-fg-muted transition-colors hover:text-fg"
-              >
-                {link}
-              </a>
-            ))}
+            {links.map((link) => {
+              const isActive = link.href === "/"
+                ? pathname === "/"
+                : pathname.startsWith(link.href);
+              return (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className={`nav-link text-sm transition-colors ${
+                    isActive ? "font-medium text-fg" : "text-fg-muted hover:text-fg"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </nav>
 
           <div className="hidden items-center gap-3 md:flex">
@@ -64,12 +83,12 @@ export function NavHeader() {
             >
               Sign in
             </a>
-            <a
-              href="#"
+            <Link
+              href="/pricing"
               className="inline-flex h-9 items-center rounded-lg bg-accent px-4 text-sm font-medium text-white transition-all hover:bg-accent-hover hover:shadow-[0_4px_16px_rgba(120,113,108,0.3)]"
             >
               Get access
-            </a>
+            </Link>
           </div>
 
           <button
@@ -101,28 +120,30 @@ export function NavHeader() {
           >
             <nav className="flex flex-col gap-1 px-6">
               {links.map((link, i) => (
-                <motion.a
-                  key={link}
-                  href="#"
-                  className="rounded-lg px-4 py-3 text-lg font-medium text-fg transition-colors hover:bg-accent-light"
+                <motion.div
+                  key={link.label}
                   initial={reduceMotion ? {} : { opacity: 0, x: -12 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.05, duration: 0.2 }}
-                  onClick={() => setMobileOpen(false)}
                 >
-                  {link}
-                </motion.a>
+                  <Link
+                    href={link.href}
+                    className="block rounded-lg px-4 py-3 text-lg font-medium text-fg transition-colors hover:bg-accent-light"
+                  >
+                    {link.label}
+                  </Link>
+                </motion.div>
               ))}
               <div className="mt-6 flex flex-col gap-3 border-t border-border pt-6">
                 <a href="#" className="text-base text-fg-muted transition-colors hover:text-fg">
                   Sign in
                 </a>
-                <a
-                  href="#"
+                <Link
+                  href="/pricing"
                   className="inline-flex h-12 items-center justify-center rounded-lg bg-accent px-6 text-sm font-medium text-white"
                 >
                   Get access
-                </a>
+                </Link>
               </div>
             </nav>
           </motion.div>

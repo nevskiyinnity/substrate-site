@@ -1,12 +1,33 @@
 "use client";
 
+import Link from "next/link";
 import { useMotion } from "./motion-provider";
 
 const footerLinks = {
-  Product: ["Overview", "Pricing", "Changelog", "Status"],
-  Resources: ["Documentation", "API Reference", "CLI Guide", "Terraform Provider"],
-  Company: ["About", "Blog", "Careers", "Contact"],
-  Legal: ["Privacy", "Terms", "Security", "SLA"],
+  Product: [
+    { label: "Overview", href: "/" },
+    { label: "Pricing", href: "/pricing" },
+    { label: "Changelog", href: "/changelog" },
+    { label: "Security", href: "/security" },
+  ],
+  Resources: [
+    { label: "Documentation", href: "/docs" },
+    { label: "API Reference", href: "/docs/api" },
+    { label: "CLI Guide", href: "/docs/cli" },
+    { label: "Terraform Provider", href: "/docs/terraform" },
+  ],
+  Company: [
+    { label: "About", href: "/about" },
+    { label: "Blog", href: "#" },
+    { label: "Careers", href: "#" },
+    { label: "Contact", href: "/contact" },
+  ],
+  Legal: [
+    { label: "Privacy", href: "#" },
+    { label: "Terms", href: "#" },
+    { label: "Security", href: "/security" },
+    { label: "SLA", href: "#" },
+  ],
 };
 
 export function Footer() {
@@ -69,15 +90,25 @@ export function Footer() {
                 {category}
               </p>
               <nav className="mt-4 flex flex-col gap-2.5">
-                {links.map((link) => (
-                  <a
-                    key={link}
-                    href="#"
-                    className="text-sm text-white/40 transition-colors hover:text-white/70"
-                  >
-                    {link}
-                  </a>
-                ))}
+                {links.map((link) =>
+                  link.href === "#" ? (
+                    <a
+                      key={link.label}
+                      href="#"
+                      className="text-sm text-white/40 transition-colors hover:text-white/70"
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <Link
+                      key={link.label}
+                      href={link.href}
+                      className="text-sm text-white/40 transition-colors hover:text-white/70"
+                    >
+                      {link.label}
+                    </Link>
+                  )
+                )}
               </nav>
             </div>
           ))}
