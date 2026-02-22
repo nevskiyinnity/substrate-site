@@ -32,10 +32,10 @@ function useCountUp(target: number, active: boolean, isFloat = false, duration =
 }
 
 const stats = [
-  { value: 30, prefix: "< ", suffix: "s", label: "Provisioning time" },
-  { value: 99.9, prefix: "", suffix: "%", label: "Uptime SLA", isFloat: true },
-  { value: 40, prefix: "", suffix: "+", label: "GPU configurations" },
-  { value: 0, prefix: "", suffix: "", label: "Pay per second", display: "Per-second" },
+  { value: 30, prefix: "< ", suffix: "s", label: "Provisioning time", sublabel: "From API call to SSH-ready" },
+  { value: 99.9, prefix: "", suffix: "%", label: "Uptime SLA", isFloat: true, sublabel: "Guaranteed availability" },
+  { value: 40, prefix: "", suffix: "+", label: "GPU configurations", sublabel: "A100, H100, H200 available" },
+  { value: 0, prefix: "", suffix: "", label: "Per-second billing", display: "Per-second", sublabel: "No rounding, no minimums" },
 ];
 
 function StatItem({
@@ -56,7 +56,7 @@ function StatItem({
 
   return (
     <motion.div
-      className="flex flex-col"
+      className="relative flex flex-col"
       initial={reduceMotion ? {} : { opacity: 0, y: 16 }}
       animate={isInView || reduceMotion ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5, delay: reduceMotion ? 0 : index * 0.1 }}
@@ -72,7 +72,8 @@ function StatItem({
           </>
         )}
       </p>
-      <p className="mt-2 text-sm text-fg-muted">{stat.label}</p>
+      <p className="mt-2 text-sm font-medium text-fg">{stat.label}</p>
+      <p className="mt-0.5 text-xs text-fg-muted">{stat.sublabel}</p>
     </motion.div>
   );
 }
@@ -82,7 +83,10 @@ export function MetricsStrip() {
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section className="bg-surface px-6 py-20 sm:py-28" ref={ref}>
+    <section className="relative bg-surface px-6 py-20 sm:py-28" ref={ref}>
+      {/* Top accent line */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/20 to-transparent" />
+
       <div className="mx-auto max-w-5xl">
         <div className="grid grid-cols-2 gap-10 lg:grid-cols-4 lg:gap-8">
           {stats.map((stat, i) => (
@@ -90,6 +94,9 @@ export function MetricsStrip() {
           ))}
         </div>
       </div>
+
+      {/* Bottom accent line */}
+      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-accent/20 to-transparent" />
     </section>
   );
 }

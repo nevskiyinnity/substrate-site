@@ -178,8 +178,16 @@ export function CodeBlockWithCopy() {
   const Renderer = renderers[activeTab];
 
   return (
-    <section className="px-6 py-24 sm:py-32" ref={ref}>
-      <div className="mx-auto max-w-3xl">
+    <section className="relative overflow-hidden px-6 py-24 sm:py-32" ref={ref}>
+      {/* Ambient glow behind section */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 50% 40% at 50% 60%, rgba(120,113,108,0.04) 0%, transparent 70%)",
+        }}
+      />
+      <div className="relative mx-auto max-w-3xl">
         <motion.p
           className="text-xs font-medium uppercase tracking-widest text-fg-muted"
           initial={reduceMotion ? {} : { opacity: 0 }}
@@ -210,7 +218,7 @@ export function CodeBlockWithCopy() {
           className="relative mt-10 overflow-hidden rounded-xl border border-border bg-[#FAFAFA]"
           style={{
             boxShadow:
-              "0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04)",
+              "0 4px 24px rgba(0,0,0,0.08), 0 12px 48px rgba(0,0,0,0.05)",
           }}
           initial={reduceMotion ? {} : { opacity: 0, y: 12 }}
           animate={isInView || reduceMotion ? { opacity: 1, y: 0 } : {}}

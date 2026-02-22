@@ -10,65 +10,71 @@ const features = [
     description:
       "Only allocate the resources you need. No paying for idle cores or unused memory sitting in a fixed SKU.",
     icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="3" width="7" height="7" rx="1" />
         <rect x="14" y="3" width="7" height="7" rx="1" />
         <rect x="3" y="14" width="7" height="7" rx="1" />
         <path d="M17.5 14v7M14 17.5h7" />
       </svg>
     ),
+    accent: "from-stone-100 to-stone-50",
   },
   {
     title: "Predictable performance",
     description:
       "Dedicated cores and memory, not shared bursts. Consistent throughput for every job, every time.",
     icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
       </svg>
     ),
+    accent: "from-blue-50 to-slate-50",
   },
   {
     title: "Built for AI workloads",
     description:
       "Training, inference, rendering, simulation. Infrastructure shaped for the demands of modern compute.",
     icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
       </svg>
     ),
+    accent: "from-amber-50 to-orange-50/50",
   },
   {
     title: "Per-second billing",
     description:
       "Pay for exactly what you run. Billing stops the moment your job ends — no rounding to the nearest hour.",
     icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="10" />
         <polyline points="12 6 12 12 16 14" />
       </svg>
     ),
+    accent: "from-emerald-50 to-green-50/50",
   },
   {
     title: "Instant teardown",
     description:
       "Instances are fully cleaned and returned to the pool in seconds. No lingering costs, no stale state.",
     icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
       </svg>
     ),
+    accent: "from-yellow-50 to-amber-50/50",
   },
   {
     title: "API + Terraform native",
     description:
       "First-class Terraform provider and REST API. Integrate into any existing IaC pipeline in minutes.",
     icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <polyline points="16 18 22 12 16 6" />
         <polyline points="8 6 2 12 8 18" />
       </svg>
     ),
+    accent: "from-violet-50 to-purple-50/50",
   },
 ];
 
@@ -101,7 +107,7 @@ export function FeatureCards() {
           {features.map((feature, i) => (
             <motion.div
               key={feature.title}
-              className="group rounded-xl border border-border border-t-2 border-t-accent/30 bg-white p-7 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)]"
+              className="group relative overflow-hidden rounded-xl border border-border bg-white p-7 transition-all duration-200 hover:-translate-y-1 hover:border-accent/40 hover:shadow-lg"
               style={{
                 boxShadow:
                   "0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04)",
@@ -113,10 +119,13 @@ export function FeatureCards() {
                 delay: reduceMotion ? 0 : 0.2 + i * 0.08,
               }}
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent-light text-accent transition-transform duration-200 group-hover:rotate-6">
+              {/* Subtle gradient top accent */}
+              <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${feature.accent}`} />
+
+              <div className={`flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br ${feature.accent} text-accent ring-1 ring-black/[0.04] transition-transform duration-200 group-hover:scale-105`}>
                 {feature.icon}
               </div>
-              <h3 className="mt-4 text-base font-semibold text-fg">
+              <h3 className="mt-5 text-base font-semibold text-fg">
                 {feature.title}
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-fg-muted">
